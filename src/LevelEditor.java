@@ -6,7 +6,10 @@ import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 
+import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
@@ -30,13 +33,7 @@ public class LevelEditor extends JLabel implements MouseListener {
 	@Override
 	public void mouseClicked(MouseEvent arg0) {
 				
-		Graphics2D curImage = this.board.createGraphics();
-		curImage.setColor(Color.WHITE);
-		curImage.fillRect(arg0.getX(), arg0.getY(), 10, 10);
-		curImage.dispose();
-		
-		repaint();
-		revalidate();
+		//drawWhiteBox(Helpers.round(arg0.getX()), Helpers.round(arg0.getY()), 10, 10);
 		
 	}
 
@@ -56,51 +53,128 @@ public class LevelEditor extends JLabel implements MouseListener {
 	public void mousePressed(MouseEvent e) {
 		this.clickStart = e.getPoint();
 	}
-
+	
+	/**
+	 * Draws an image to board
+	 * @param img the image that is to be drawn
+	 * @param x Starting x pos
+	 * @param y Starting y pos
+	 */
+	public void drawImg (BufferedImage img, int x, int y) {
+		
+		for (int i = 0; i < img.getWidth(); i++) {
+			
+			for (int j = 0; j < img.getHeight(); j++) {
+				board.setRGB(i+x, j+y, img.getRGB(i, j));
+			}
+			
+		}
+		
+		repaint();
+		revalidate();
+		
+	}
+	
+	/**
+	 * Draws a white box to board
+	 * @param x Start x
+	 * @param y Start y
+	 * @param width width of box
+	 * @param height height of box
+	 */
+	public void drawWhiteBox (int x, int y, int width, int height) {
+		
+		Graphics2D curImage = this.board.createGraphics();
+		curImage.setColor(Color.WHITE);
+		curImage.fillRect(x,y,width,height);
+		curImage.dispose();
+		
+		repaint();
+		revalidate();
+		
+	}
+	
 	@Override
 	public void mouseReleased(MouseEvent e) {
 		
-		int imgWidth = 10;
-		int imgHeight = 10;
+		File objectToDraw = new File ("D:\\Java_Projects\\LevelEditor\\src\\redX.png");
+		BufferedImage img = null;
+		
+		try {
+			img = ImageIO.read(objectToDraw);
+		} catch (IOException e1) {
+			e1.printStackTrace();
+			return;
+		}
+	
+		int imgWidth = img.getWidth();
+		int imgHeight = img.getHeight();
 		
 		Point clickRelease = e.getPoint();
+	
+		int startX = Helpers.round((int)this.clickStart.getX());
+		int startY = Helpers.round((int)this.clickStart.getY());
+		int endX = Helpers.round((int)clickRelease.getX());
+		int endY = Helpers.round((int)clickRelease.getY());
+				
+		int incXBy = 0;
+		int incYBy = 0;
 		
-		int startX = (int)this.clickStart.getX();
-		int startY = (int)this.clickStart.getY();
-		int endX = (int)clickRelease.getX();
-		int endY = (int)clickRelease.getY();
+		if (startX != endX) {
+			incXBy = endX > startX ? imgWidth : -1*imgWidth;
+		}
 		
-		int diffX = (int)(clickRelease.getX() - this.clickStart.getX());
-		int diffY = (int)(clickRelease.getY() - this.clickStart.getY());
-		
-		boolean isXLocked = diffX < diffY;
-		boolean isYLocked = !isXLocked;
-		
-		boolean stillDrawing = true;
+		if (startY != endY) {
+			incYBy = endY > startY ? imgHeight : -1*imgHeight;
+		}
 		
 		int curX = startX;
 		int curY = startY;
 		
-		while (stillDrawing) {
+		boolean somethingDrawnThisFrame = true;
+		
+		//continue drawing while there is a new block to draw
+		while (somethingDrawnThisFrame) {
+		
+			//draw image, and then reset the drawing flag
+			drawImg(img, curX, curY);
+			somethingDrawnThisFrame = false;
 			
-			Graphics2D curImage = this.board.createGraphics();
-			curImage.setColor(Color.WHITE);
-			curImage.fillRect(curX, curY, imgWidth, imgHeight);
-			curImage.dispose();
-			
-			stillDrawing = false;
-			
-			if (!isXLocked && curX + imgWidth > endX) {
-				curX += imgWidth;
-				stillDrawing = true;
-			}
-			
-			if (!isYLocked && curY + imgHeight > endY) {
-				curY += imgHeight;
-				stillDrawing = true;
-			}
+			//check if there is even anything to update for x
+			if (incXBy != 0) {
 				
-		}
+				//moving to the left
+				if (incXBy < 0 && curX > endX) {
+					somethingDrawnThisFrame = true;
+					curX += incXBy;
+				}
+				
+				//moving to the right
+				else if (incXBy > 0 && curX < endX) {
+					somethingDrawnThisFrame = true;
+					curX += incXBy;
+				}
+				
+			}
+
+			//check if there is even anything to update for y
+			if (incYBy != 0) {
+				
+				//moving down
+				if (incYBy < 0 && curY > endY) {
+					somethingDrawnThisFrame = true;
+					curY += incYBy;
+				}
+				
+				//moving up
+				else if (incYBy > 0 && curY < endY) {
+					somethingDrawnThisFrame = true;
+					curY += incYBy;
+				}
+				
+			}
+			
+		} 
 		
 		repaint();
 		revalidate();
