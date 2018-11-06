@@ -1,15 +1,16 @@
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
 
-import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
@@ -20,9 +21,12 @@ public class LevelEditor extends JLabel implements MouseListener {
 	//stores where a click began.  to be used to
 	private Point clickStart;
 	
+	private List <Entity> entitiesInLevel;
+
 	public LevelEditor (Dimension dim) {
 		
 		this.board = new BufferedImage (dim.width, dim.height, BufferedImage.TYPE_3BYTE_BGR);
+		this.entitiesInLevel = new ArrayList <Entity> ();
 		addMouseListener(this);
 		this.setIcon(new ImageIcon(board));
 		this.setSize(dim);
@@ -97,34 +101,30 @@ public class LevelEditor extends JLabel implements MouseListener {
 	@Override
 	public void mouseReleased(MouseEvent e) {
 		
-		File objectToDraw = new File ("D:\\Java_Projects\\LevelEditor\\src\\redX.png");
-		BufferedImage img = null;
-		
-		try {
-			img = ImageIO.read(objectToDraw);
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return;
-		}
+		BufferedImage img = Entity.getImageData(Helpers.EntityID.redX);
 	
 		int imgWidth = img.getWidth();
 		int imgHeight = img.getHeight();
 		
 		Point clickRelease = e.getPoint();
-	
+		
+		Entity newEntity = new Entity (clickStart, clickRelease, Helpers.EntityID.redX);
+		entitiesInLevel.add(newEntity);
+		
 		int startX = Helpers.round((int)this.clickStart.getX());
 		int startY = Helpers.round((int)this.clickStart.getY());
 		int endX = Helpers.round((int)clickRelease.getX());
 		int endY = Helpers.round((int)clickRelease.getY());
-				
+		
 		int incXBy = 0;
 		int incYBy = 0;
 		
-		if (startX != endX) {
+		if (Math.abs(endX-startX) > Math.abs(endY-startY)) {
 			incXBy = endX > startX ? imgWidth : -1*imgWidth;
 		}
 		
-		if (startY != endY) {
+		//only allow changes in one dimension
+		else {
 			incYBy = endY > startY ? imgHeight : -1*imgHeight;
 		}
 		
@@ -178,6 +178,29 @@ public class LevelEditor extends JLabel implements MouseListener {
 		
 		repaint();
 		revalidate();
+		
+	}
+	
+	public void saveEntities (File path) {
+		
+		PrintWriter output = null;
+		
+		try {
+			output = new PrintWriter (path);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		for (Entity curEnt: entitiesInLevel) {
+			
+			String curLine = curEnt.saveInfo() + "\n\r";
+			output.write(curLine);
+			
+		}
+		
+		output.flush();
+		output.close();
 		
 	}
 	
