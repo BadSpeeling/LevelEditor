@@ -108,13 +108,13 @@ public class LevelEditor extends JLabel implements MouseListener {
 		
 		Point clickRelease = e.getPoint();
 		
-		Entity newEntity = new Entity (clickStart, clickRelease, Helpers.EntityID.redX);
-		entitiesInLevel.add(newEntity);
-		
 		int startX = Helpers.round((int)this.clickStart.getX());
 		int startY = Helpers.round((int)this.clickStart.getY());
 		int endX = Helpers.round((int)clickRelease.getX());
 		int endY = Helpers.round((int)clickRelease.getY());
+		
+		Entity newEntity = new Entity (startX, startY, endX, endY, imgWidth, imgHeight, Helpers.EntityID.redX);
+		entitiesInLevel.add(newEntity);
 		
 		int incXBy = 0;
 		int incYBy = 0;
@@ -124,7 +124,7 @@ public class LevelEditor extends JLabel implements MouseListener {
 		}
 		
 		//only allow changes in one dimension
-		else {
+		else if (Math.abs(endX-startX) < Math.abs(endY-startY)) {
 			incYBy = endY > startY ? imgHeight : -1*imgHeight;
 		}
 		
@@ -194,7 +194,7 @@ public class LevelEditor extends JLabel implements MouseListener {
 		
 		for (Entity curEnt: entitiesInLevel) {
 			
-			String curLine = curEnt.saveInfo() + "\n\r";
+			String curLine = curEnt.saveInfo() + "\r";
 			output.write(curLine);
 			
 		}
