@@ -1,3 +1,4 @@
+package Editor;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
@@ -14,6 +15,10 @@ import java.util.List;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
+import Entities.Block;
+import General.Helpers;
+import General.Helpers.EntityID;
+
 public class LevelEditor extends JLabel implements MouseListener {
 	
 	private BufferedImage board; 
@@ -21,12 +26,12 @@ public class LevelEditor extends JLabel implements MouseListener {
 	//stores where a click began.  to be used to
 	private Point clickStart;
 	
-	private List <Entity> entitiesInLevel;
+	private List <Block> entitiesInLevel;
 
 	public LevelEditor (Dimension dim) {
 		
 		this.board = new BufferedImage (dim.width, dim.height, BufferedImage.TYPE_3BYTE_BGR);
-		this.entitiesInLevel = new ArrayList <Entity> ();
+		this.entitiesInLevel = new ArrayList <Block> ();
 		addMouseListener(this);
 		this.setIcon(new ImageIcon(board));
 		this.setSize(dim);
@@ -101,7 +106,7 @@ public class LevelEditor extends JLabel implements MouseListener {
 	@Override
 	public void mouseReleased(MouseEvent e) {
 		
-		BufferedImage img = Entity.getImageData(Helpers.EntityID.redX);
+		BufferedImage img = Block.getImageData(Helpers.EntityID.redX);
 	
 		int imgWidth = img.getWidth();
 		int imgHeight = img.getHeight();
@@ -113,7 +118,7 @@ public class LevelEditor extends JLabel implements MouseListener {
 		int endX = Helpers.round((int)clickRelease.getX());
 		int endY = Helpers.round((int)clickRelease.getY());
 		
-		Entity newEntity = new Entity (startX, startY, endX, endY, imgWidth, imgHeight, Helpers.EntityID.redX);
+		Block newEntity = new Block (startX, startY, endX, endY, imgWidth, imgHeight, Helpers.EntityID.redX);
 		entitiesInLevel.add(newEntity);
 		
 		int incXBy = 0;
@@ -192,7 +197,7 @@ public class LevelEditor extends JLabel implements MouseListener {
 			e.printStackTrace();
 		}
 		
-		for (Entity curEnt: entitiesInLevel) {
+		for (Block curEnt: entitiesInLevel) {
 			
 			String curLine = curEnt.saveInfo() + "\r";
 			output.write(curLine);

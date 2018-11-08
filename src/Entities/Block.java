@@ -1,3 +1,4 @@
+package Entities;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
@@ -6,7 +7,10 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-public class Entity implements Comparable <Entity>  {
+import Editor.Orientation;
+import General.Helpers;
+
+public class Block implements Comparable <Block>  {
 	
 	private Point startPos;
 	private Dimension entitySize;
@@ -14,7 +18,7 @@ public class Entity implements Comparable <Entity>  {
 	private int timesRepeat;
 	private int entityID;
 	
-	public Entity (int startX, int startY, int endX, int endY, int imgWidth, int imgHeight, int entityID) {
+	public Block (int startX, int startY, int endX, int endY, int imgWidth, int imgHeight, int entityID) {
 		
 		this.startPos = new Point (startX, startY);
 		this.entitySize = new Dimension (imgWidth, imgHeight);
@@ -79,7 +83,7 @@ public class Entity implements Comparable <Entity>  {
 	/**
 	 * Standard compare to method.  Compares by x coordinate and then y coordinate in case of tie
 	 */
-	public int compareTo(Entity arg0) {
+	public int compareTo(Block arg0) {
 		
 		int xDif = startPos.x - arg0.startPos.x;
 		
