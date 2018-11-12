@@ -1,4 +1,4 @@
-package Editor;
+package Entities;
 
 /**
  * Represents the 4 ways that a block can be oriented.

@@ -7,7 +7,6 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-import Editor.Orientation;
 import General.Helpers;
 
 public class Block implements Comparable <Block>  {

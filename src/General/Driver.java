@@ -22,7 +22,7 @@ public class Driver {
 		Actor player = game.getPlayer();
 		
 		game.drawActor(player);
-		game.moveActorBy(player, 1, 1);
+		game.run();
 		
 	}
 	

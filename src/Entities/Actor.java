@@ -14,6 +14,9 @@ public class Actor {
 	private BufferedImage sprite;
 	private Coordinate coor;
 	
+	private double dx;
+	private double dy;
+	
 	public Actor (String spritePath, int x, int y) {
 		
 		try {
@@ -23,6 +26,8 @@ public class Actor {
 		}
 		
 		this.coor = new Coordinate (x, y);
+		this.dx = 0;
+		this.dy = 0;
 		
 	}
 	
@@ -31,7 +36,7 @@ public class Actor {
 	 * @param dx The amount to move in the x direction
 	 * @param dy The amount to move in the y direction
 	 */
-	public void move (int dx, int dy) {
+	public void move (double dx, double dy) {
 		coor.translate(dx, dy);
 	}
 
@@ -41,6 +46,22 @@ public class Actor {
 
 	public Coordinate getCoor() {
 		return coor;
+	}
+	
+	public void changeDX (double by) {
+		this.dx += by;
+	}
+	
+	public void changeDY (double by) {
+		this.dy += by; 
+	}
+	
+	public double getDX () {
+		return dx;
+	}
+	
+	public double getDY () {
+		return dy;
 	}
 	
 }
