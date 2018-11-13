@@ -16,14 +16,21 @@ public class Driver {
 		
 		Dimension mainViewDim = new Dimension (editorWidth, editorHeight);
 		
-		//LevelEditorContainer game = new LevelEditorContainer (mainViewDim);
-		GameContainer game = new GameContainer (mainViewDim);
+		game(mainViewDim);
+		
+		
+	}
 	
+	public static void editor (Dimension dim) {
+		LevelEditorContainer game = new LevelEditorContainer (dim);
+	}
+	
+	public static void game (Dimension dim) {
+		
+		GameContainer game = new GameContainer (dim);
 		Actor player = game.getPlayer();
 		
-		game.drawActor(player);
 		game.run();
-		
 	}
 	
 }

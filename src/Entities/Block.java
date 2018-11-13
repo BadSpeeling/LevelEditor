@@ -4,6 +4,7 @@ import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.Vector;
 
 import javax.imageio.ImageIO;
 
@@ -17,40 +18,31 @@ public class Block implements Comparable <Block>  {
 	private int timesRepeat;
 	private int entityID;
 	
-	public Block (int startX, int startY, int endX, int endY, int imgWidth, int imgHeight, int entityID) {
+	public Block (Point start, Point end, Dimension entitySize, Orientation dir, int entityID) {
 		
-		this.startPos = new Point (startX, startY);
-		this.entitySize = new Dimension (imgWidth, imgHeight);
+		Point tempEnd = null;
 		
-		int incXBy = 0;
-		int incYBy = 0;
-		
-		if (Math.abs(endX-startX) > Math.abs(endY-startY)) {
-			incXBy = endX > startX ? imgWidth : -1*imgWidth;
-			this.dir = endX > startX ? Orientation.LR : Orientation.RL;
-		}
-		
-		//only allow changes in one dimension
-		else if (Math.abs(endX-startX) < Math.abs(endY-startY)) {
-			incYBy = endY > startY ? imgHeight : -1*imgHeight;
-			this.dir = endY > startY ? Orientation.DU : Orientation.UD;
+		if ((dir.equals(Orientation.HORI) && end.x > start.x) || (dir.equals(Orientation.VERT) && end.y > start.y)) {
+			this.startPos = start;
+			tempEnd = end;
 		}
 		
 		else {
-			this.dir = Orientation.NONE;
+			this.startPos = end;
+			tempEnd = start;
 		}
 		
+		this.entitySize = entitySize;
+		this.dir = dir;
 		this.entityID = entityID;
 		this.timesRepeat = 0;
 		
-		int curX = startX;
-		int curY = startY;
+		int incXBy = dir.equals(Orientation.HORI) ? entitySize.width : 0;
+		int incYBy = incXBy == 0 ? entitySize.height : 0;
+		int curX = this.startPos.x;
+		int curY = this.startPos.y;
 		
-		//increment the number of times to draw this object while within it's bounds
-		while (!this.dir.equals(Orientation.NONE) && (this.dir.equals(Orientation.LR) && curX < endX) || 
-				(this.dir.equals(Orientation.RL) && curX > endX) || 
-				(this.dir.equals(Orientation.DU) && curY < endY) ||
-				((this.dir.equals(Orientation.UD) && curY > endY))) {
+		while ((dir.equals(Orientation.HORI) && tempEnd.x > curX) || (dir.equals(Orientation.VERT) && tempEnd.y > curY)) {
 			
 			curX += incXBy;
 			curY += incYBy;
@@ -58,6 +50,32 @@ public class Block implements Comparable <Block>  {
 			
 		}
 		
+		
+	}
+	
+	public Block (String input) {
+		
+		final int expectedInputSize = 7;
+		String [] spl = input.split(",");
+		
+		if (spl.length != expectedInputSize) {
+			throw new IllegalArgumentException("input should have " + expectedInputSize + "comma seperated values, but it instead has " + spl.length);
+		}
+		
+		this.startPos = new Point (Integer.parseInt(spl[1]), Integer.parseInt(spl[2]));
+		this.entitySize = new Dimension (Integer.parseInt(spl[3]), Integer.parseInt(spl[4]));
+		this.dir = Orientation.convert(Integer.parseInt(spl[6]));
+		this.timesRepeat = Integer.parseInt(spl[5]);
+		this.entityID = Integer.parseInt(spl[0]);
+		
+	}
+	
+	public Orientation getOrientation () {
+		return dir;
+	}
+	
+	public int getTimesRepeat () {
+		return timesRepeat;
 	}
 	
 	public static BufferedImage getImageData (int assetID) {
@@ -108,20 +126,12 @@ public class Block implements Comparable <Block>  {
 		//update the appropriate coordinate based in orientation and repeats
 		for (int i = 0; i < timesRepeat; i++) {
 			
-			if (dir.equals(Orientation.LR)) {
+			if (dir.equals(Orientation.HORI)) {
 				x += entitySize.width;
 			}
 			
-			else if (dir.equals(Orientation.RL)) {
-				x -= entitySize.width;
-			}
-			
-			else if (dir.equals(Orientation.DU)) {
+			else if (dir.equals(Orientation.VERT)) {
 				y += entitySize.height;
-			}
-			
-			else {
-				y -= entitySize.height;
 			}
 			
 		}
@@ -130,8 +140,22 @@ public class Block implements Comparable <Block>  {
 		
 	}
 	
+	public Dimension getEntitySize ( ) {
+		return entitySize;
+	}
+	
 	public int getEntityID () {
 		return entityID;
+	}
+	
+	public Point getBlockPosition (int numInOrder) {
+		
+		Vector <Integer> valModifiers = new Vector <Integer> (2);
+		int xMod = 0;
+		int yMod = 0;
+		
+		return null;
+		
 	}
 	
 	/**

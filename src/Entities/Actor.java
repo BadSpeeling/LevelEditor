@@ -7,15 +7,14 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-import General.Coordinate;
+import General.Position;
+import General.Vector;
 
 public class Actor {
 
 	private BufferedImage sprite;
-	private Coordinate coor;
-	
-	private double dx;
-	private double dy;
+	private Position coor;
+	private Vector velo;
 	
 	public Actor (String spritePath, int x, int y) {
 		
@@ -25,9 +24,8 @@ public class Actor {
 			e.printStackTrace();
 		}
 		
-		this.coor = new Coordinate (x, y);
-		this.dx = 0;
-		this.dy = 0;
+		this.coor = new Position (x, y);
+		this.velo = new Vector (0, 0);
 		
 	}
 	
@@ -44,24 +42,24 @@ public class Actor {
 		return sprite;
 	}
 
-	public Coordinate getCoor() {
+	public Position getCoor() {
 		return coor;
 	}
 	
-	public void changeDX (double by) {
-		this.dx += by;
+	public void setDX (double by) {
+		this.velo.setX(by);
 	}
 	
-	public void changeDY (double by) {
-		this.dy += by; 
+	public void setDY (double by) {
+		this.velo.setY(by);
 	}
 	
 	public double getDX () {
-		return dx;
+		return velo.getX();
 	}
 	
 	public double getDY () {
-		return dy;
+		return velo.getY();
 	}
 	
 }

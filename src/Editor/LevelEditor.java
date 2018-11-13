@@ -16,6 +16,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
 import Entities.Block;
+import Entities.Orientation;
 import General.Helpers;
 import General.Helpers.EntityID;
 
@@ -118,66 +119,38 @@ public class LevelEditor extends JLabel implements MouseListener {
 		int endX = Helpers.round((int)clickRelease.getX());
 		int endY = Helpers.round((int)clickRelease.getY());
 		
-		Block newEntity = new Block (startX, startY, endX, endY, imgWidth, imgHeight, Helpers.EntityID.redX);
-		entitiesInLevel.add(newEntity);
-		
-		int incXBy = 0;
-		int incYBy = 0;
+		Orientation dir;
 		
 		if (Math.abs(endX-startX) > Math.abs(endY-startY)) {
-			incXBy = endX > startX ? imgWidth : -1*imgWidth;
+			dir = Orientation.HORI;
 		}
 		
 		//only allow changes in one dimension
 		else if (Math.abs(endX-startX) < Math.abs(endY-startY)) {
-			incYBy = endY > startY ? imgHeight : -1*imgHeight;
+			dir = Orientation.VERT;
 		}
 		
-		int curX = startX;
-		int curY = startY;
+		else {
+			dir = Orientation.NONE;
+		}
 		
-		boolean somethingDrawnThisFrame = true;
+		Block newEntity = new Block (new Point(startX, startY), new Point (endX, endY), new Dimension (imgWidth, imgHeight), dir, Helpers.EntityID.redX);
+		entitiesInLevel.add(newEntity);
+		
+		Point start = newEntity.getStartPos();
+		Dimension dim = newEntity.getEntitySize();
+		
+		int curX = start.x;
+		int curY = start.y;
 		
 		//continue drawing while there is a new block to draw
-		while (somethingDrawnThisFrame) {
-		
+		for (int i = 0; i <= newEntity.getTimesRepeat(); i++) {
+			
 			//draw image, and then reset the drawing flag
 			drawImg(img, curX, curY);
-			somethingDrawnThisFrame = false;
 			
-			//check if there is even anything to update for x
-			if (incXBy != 0) {
-				
-				//moving to the left
-				if (incXBy < 0 && curX > endX) {
-					somethingDrawnThisFrame = true;
-					curX += incXBy;
-				}
-				
-				//moving to the right
-				else if (incXBy > 0 && curX < endX) {
-					somethingDrawnThisFrame = true;
-					curX += incXBy;
-				}
-				
-			}
-
-			//check if there is even anything to update for y
-			if (incYBy != 0) {
-				
-				//moving down
-				if (incYBy < 0 && curY > endY) {
-					somethingDrawnThisFrame = true;
-					curY += incYBy;
-				}
-				
-				//moving up
-				else if (incYBy > 0 && curY < endY) {
-					somethingDrawnThisFrame = true;
-					curY += incYBy;
-				}
-				
-			}
+			curX += dir.equals(Orientation.HORI) ? dim.width : 0;
+			curY += dir.equals(Orientation.VERT) ? dim.height : 0;
 			
 		} 
 		
